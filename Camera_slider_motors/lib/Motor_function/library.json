@@ -1,0 +1,17 @@
+{
+    "name":"Motor_function",
+    "version":"1.0.0",
+    
+    "frameworks":["atmelavr", "arduino"],
+    "platforms":"*",
+
+    "dependencies":{
+        "owner":"mikem",
+        "name":"AccelStepper",
+        "version":"^1.61"
+    },
+
+    "build":{
+        "libArchive":true
+    }
+}

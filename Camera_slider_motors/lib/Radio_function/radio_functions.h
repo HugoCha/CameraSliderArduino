@@ -36,7 +36,7 @@ typedef struct menu{
     byte menu = 20; // man_comm, programmed_mann, programmed_num, record_traj ,timelapse, tracking, homing
     byte pose_number = -1;
     int PointA[3] = {0, 0, 0};
-    uint16_t ms_delay = 0;
+    byte nb_of_point = 0;
 } MENU;
 
 typedef struct telecommand {
@@ -55,7 +55,6 @@ typedef struct option {
     byte option_change = 0;
     byte precision = 0;
     byte h_camera = 0;
-    byte l_camera = 0;
     byte l_lens = 0;
     byte r_lens = 0;
     unsigned short slider_limits[2] = {short(SLIDER_LOW_LIMIT), short(SLIDER_UP_LIMIT)};
@@ -91,7 +90,7 @@ inline bool operator==(const MENU &M1, const MENU& M2){
         M1.menu == M2.menu &&
         M1.pose_number == M2.pose_number &&
         M1.PointA[0] == M2.PointA[0] && M1.PointA[1] == M2.PointA[1] && M1.PointA[2] == M2.PointA[2] &&
-        M1.ms_delay == M2.ms_delay
+        M1.nb_of_point == M2.nb_of_point
     );
 }
 

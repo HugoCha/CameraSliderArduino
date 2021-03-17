@@ -24,9 +24,9 @@ const int power10[5] = {1, 10, 100, 1000, 10000};
  * @param sign 0 if number is unsigned >0 if is signed
  * @return 0 if no problem -1 else
 **/
-int enter_number(LiquidCrystal_I2C *lcd, int& number, const uint8_t& nb_size, const uint8_t& col, const uint8_t& row, const uint8_t& sign, const int& min_number=-1, const int& max_number=-1);
+int enter_number(LiquidCrystal_I2C *lcd, int& number, const uint8_t& nb_size, const uint8_t& col, const uint8_t& row, const uint8_t& sign, const int& min_number=0, const int& max_number=0);
 
-bool value_in_limit(phi_prompt_struct* myIntegerInput, int * user_input, const uint8_t& nb_size, const int& i, const int& min_number, const int& max_number);
+void value_in_limit(phi_prompt_struct* myIntegerInput, int * user_input, const uint8_t& nb_size, const int& i, const int& min_number, const int& max_number, const char* sign_input="x");
 
 int enter3number(LiquidCrystal_I2C *lcd, int number[3], const uint8_t nb_size[3], const uint8_t& row, const uint8_t sign[3], const int min_number[3], const int max_number[3]);
 

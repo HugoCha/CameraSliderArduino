@@ -67,7 +67,6 @@ void RadioMotor::updateLimits(const bool& ack){
     float float_tilt_limits[2];
     _camera->setCameraDimension(
         _slider_option.h_camera,
-        _slider_option.l_camera,
         _slider_option.l_lens, 
         _slider_option.r_lens);
     _camera->computeTiltLimits(float_tilt_limits);

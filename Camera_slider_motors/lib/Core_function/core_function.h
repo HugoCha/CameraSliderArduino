@@ -64,7 +64,7 @@ private:
     float computeTiltAngleFromPose(const short& object_pose_opposed_length, const short& object_pose_adjacent_length);
     void clearTrackingPose(void){_object_pose[0] = 10000; _object_pose[1] = -1;_object_pose[2] = -1;}
     
-    bool timelapseMode(void);
+    // bool timelapseMode(void);
     void interpolationHyperlapse(const POSE& start_pose, const POSE& end_pose, int& number_of_photo_left);
     void registerHyperlapseMode(void);
     bool hyperlapseMode(void);

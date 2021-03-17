@@ -94,7 +94,6 @@ protected:
     void display_slider_pose(const byte& pose);
     void display_motor_info(void) override;
     void display_motor_info(const int& posX, const int& angleY, const int& angleZ, const unsigned short& Vx, const unsigned short& VangleY, const unsigned short& VangleZ) override;
-    void display_motor_info_execute(const int& posX, const int& angleY, const int& angleZ, const unsigned short& Pot_x, const unsigned short& Pot_Pt);
     void display_sub_menu_title(void);
     void initRecordDisplay(void);
 
@@ -114,7 +113,7 @@ protected:
     // bool recordTraj(void);
     bool numericRecord(void);
     void enterNumericPoint(void);
-    bool hyperlapseRecord(void);
+    // bool hyperlapseRecord(void);
     bool trackingRecord(void);
 
     void updatePoint2Send(const int& nb);

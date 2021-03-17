@@ -29,10 +29,11 @@ InstructionHandler instr(&Motors, &camera, &battery);
 RadioMotor radio_motor(&myradio, &camera);
 
 unsigned long current_time = 0, start_time=0;
-// void setup_test(){
-//     //motor_test::launch_test_motor(Motors);
-//     test_core::test_core_function(instr);
-// }
+void setup_test(){
+    //motor_test::launch_test_motor(Motors);
+    //test_core::test_core_function(instr);
+    test_camera::test_compute_limits(camera);
+}
 
 void init_motor_interface(void);
 void show_radio_data(void);
@@ -41,7 +42,7 @@ void show_data(void);
 void setup() {
     Serial.begin(9600);
     //printf_begin();
-    //setup_test();
+    setup_test();
     Motors.init_motors();
     radio_motor.initRadio();
     // myradio->printDetails();

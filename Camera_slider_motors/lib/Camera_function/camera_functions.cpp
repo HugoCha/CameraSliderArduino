@@ -57,8 +57,8 @@ bool Camera::focus(void){
 
 void Camera::computeTiltLimits(float limits[2], const float& margin){
 
-    if (_r_lens > 0 && _l_lens > 0 && (_l_lens+_l_camera/2.0) >= CAMERA_PLATFORM_HEIGHT){
-        float a = (_l_camera/2.0 + _l_lens);
+    if (_r_lens > 0 && _l_lens > 0 && (_l_lens+CAMERA_PLATFORM_LENGTH/2.0) >= CAMERA_PLATFORM_HEIGHT){
+        float a = (CAMERA_PLATFORM_LENGTH/2.0 + _l_lens);
         float b = (_r_lens - (CAMERA_PLATFORM_RADIUS - _h_camera/2.0));
         float lens_vector_norm = sqrt(a*a + b*b);
         
@@ -73,7 +73,7 @@ void Camera::computeTiltLimits(float limits[2], const float& margin){
     else{limits[0] = 180;}
 
     if (_h_camera > 0 && _h_camera-CAMERA_PLATFORM_RADIUS >= CAMERA_PLATFORM_HEIGHT){
-        float a = _l_camera/2.0;
+        float a = CAMERA_PLATFORM_LENGTH/2.0;
         float b = - (_h_camera - CAMERA_PLATFORM_RADIUS);
         float top_camera_vector_norm = sqrt(a*a + b*b);
         float sol2 = acos((CAMERA_PLATFORM_HEIGHT)/top_camera_vector_norm) - atan2(a, b);

@@ -21,28 +21,25 @@ private:
     bool _shoot = false;
     bool _focus = false;
     int _h_camera;
-    int _l_camera;
     int _l_lens;
     int _r_lens;
     bool _direction;
     bool _active;
 
 public:
-    Camera(const int& h_camera=0, const int& l_camera=0, const int& l_lens=0, const int& r_lens=0, const bool& direction=0, const bool& active=true) :
-    _h_camera(h_camera), _l_camera(l_camera), _l_lens(l_lens), _r_lens(r_lens), _direction(direction), _active(active){}
+    Camera(const int& h_camera=0, const int& l_lens=0, const int& r_lens=0, const bool& direction=0, const bool& active=true) :
+    _h_camera(h_camera),  _l_lens(l_lens), _r_lens(r_lens), _direction(direction), _active(active){}
     ~Camera(){}
 
     void activate(void){_active=true;init_camera();}
     void desactivate(void){_active=false;}
 
-    void setCameraDimension(const int& hc, const int& lc, const int& ll, const int& rl){
+    void setCameraDimension(const int& hc, const int& ll, const int& rl){
         _h_camera = hc;
-        _l_camera = lc;
         _l_lens = ll;
         _r_lens = rl;
     }
     void setCameraHeight(const int& h){_h_camera=h;}
-    void setCameraLength(const int& l) {_l_camera=l;}
     void setLensLength(const int& l){_l_lens=l;}
     void setRadiusLength(const int& r){_r_lens=r;}
     void setDirection(const bool& dir){_direction=dir;}

@@ -186,18 +186,7 @@ void ProgrammedMenu::display_motor_info(const int& posX, const int& angleY, cons
     lcd->clear();
     display_sub_menu_title();
 
-    update_display_motor_info(posX, angleY, angleZ, Vx, VangleY, VangleZ);
-
-    lcd->setCursor(0,3);
-    lcd->print("OK:Register  <:Pause");
-}
-
-void ProgrammedMenu::display_motor_info_execute(const int& posX, const int& angleY, const int& angleZ, const unsigned short& Pot_X, const unsigned short& Pot_Pt)
-{
-    lcd->clear();
-    display_sub_menu_title();
-
-    update_display_motor_info(posX, angleY, angleZ, Pot_Pt, Pot_X, 0);
+    update_display_motor_info(posX, angleY, angleZ, Vx, VangleY, 0);
 
     lcd->setCursor(0,3);
     lcd->print("OK:Shoot     <:Pause");
@@ -225,25 +214,14 @@ void ProgrammedMenu::update_display_motor_info(const int& posX, const int& angle
 
 void ProgrammedMenu::display_motor_info(void)
 {
-    if (_programm == PROGRAMMED_MODE){
-        display_motor_info_execute(
-            (int)_radio_telecommand->getSliderPose(),
-            (int)_radio_telecommand->getTiltPose(),
-            (int)_radio_telecommand->getPanPose(),
-            (int)_buttons_state.potentiometerX,
-            (int)_buttons_state.potentiometerPT
-        );
-    }
-    else{
-        display_motor_info(
-            (int)_radio_telecommand->getSliderPose(),
-            (int)_radio_telecommand->getTiltPose(),
-            (int)_radio_telecommand->getPanPose(),
-            (int)_buttons_state.potentiometerX,
-            (int)_buttons_state.potentiometerPT,
-            0
-        );
-    }
+    display_motor_info(
+        (int)_radio_telecommand->getSliderPose(),
+        (int)_radio_telecommand->getTiltPose(),
+        (int)_radio_telecommand->getPanPose(),
+        (int)_buttons_state.potentiometerX,
+        (int)_buttons_state.potentiometerPT,
+        0
+    );
 }
 
 
@@ -268,8 +246,10 @@ void ProgrammedMenu::enterNumberOfPoint(void)
     
     lcd->setCursor(3,1);
     lcd->print("Number of pts");
-    
-    enter_number(lcd, nb_pt, 2, 10, 2, 0, 0, MAX_NB_POINT);
+    if (_programm == REGISTER_HYPERLAPSE_MODE)
+        enter_number(lcd, nb_pt, 3, 10, 2, 0, 0, 250);
+    else if (_programm==REGISTER_NUMERIC_MODE)
+        enter_number(lcd, nb_pt, 2, 10, 2, 0, 0, MAX_NB_POINT);
     _number_of_point = (uint8_t)nb_pt;
     return;
 }
@@ -362,7 +342,7 @@ bool ProgrammedMenu::record(){
     else if (_programm == REGISTER_TRACKING_MODE)
         return trackingRecord();
     else if (_programm == REGISTER_HYPERLAPSE_MODE)
-        return hyperlapseRecord();
+        return numericRecord();
     return true;
 }
 
@@ -390,7 +370,8 @@ bool ProgrammedMenu::numericRecord(void){
                            _crosspointarray[0].pan_pos};
     initRecordDisplay();
     display_crossing_pt_nb(0);
-    
+    _radio_telecommand->setNumberOfPoint(_number_of_point);
+    _number_of_point = (_programm == REGISTER_HYPERLAPSE_MODE)?2:_number_of_point;
 
     while (_size_of_array < _number_of_point)
     {    
@@ -468,16 +449,6 @@ bool ProgrammedMenu::trackingRecord(){
         input_nb_arr[2] = _crosspointarray[_size_of_array].pan_pos;
     }
     lcd->clear();
-    return false;
-}
-
-/************************************************************************
- * 
- * Record hyperlapse
- * 
-************************************************************************/
-
-bool ProgrammedMenu::hyperlapseRecord(void){
     return false;
 }
 

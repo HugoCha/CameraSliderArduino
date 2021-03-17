@@ -33,7 +33,7 @@ typedef struct menu{
     byte menu = 20; // man_comm, programmed_mann, programmed_num, record_traj ,timelapse, tracking, homing
     byte pose_number = -1;
     int PointA[3] = {0, 0, 0};
-    uint16_t ms_delay = 0;
+    byte nb_of_point = 0;
 } MENU;
 
 typedef struct telecommand {
@@ -52,7 +52,6 @@ typedef struct option {
     byte option_change = 0;
     byte precision=0;
     byte h_camera = 0;
-    byte l_camera = 0;
     byte l_lens = 0;
     byte r_lens = 0;
     unsigned short slider_limits[2] = {short(SLIDER_LOW_LIMIT), short(SLIDER_UP_LIMIT)};
@@ -88,7 +87,7 @@ inline bool operator==(const MENU &M1, const MENU& M2){
         M1.menu == M2.menu &&
         M1.pose_number == M2.pose_number &&
         M1.PointA[0] == M2.PointA[0] && M1.PointA[1] == M2.PointA[1] && M1.PointA[2] == M2.PointA[2] &&
-        M1.ms_delay == M2.ms_delay
+        M1.nb_of_point == M2.nb_of_point
     );
 }
 
@@ -161,9 +160,9 @@ public:
     LIMITS getLimits(void) const {return _limits;}
     int getLowLimitSlider() const {return _limits.slider_limits[0];}
     int getUpLimitSlider() const {return _limits.slider_limits[1];}
-    int getLowLimitTilt() const {return (_limits.tilt_limits[0]==180)?-1:_limits.tilt_limits[0];}
+    int getLowLimitTilt() const {return (_limits.tilt_limits[0]==180)?0:_limits.tilt_limits[0];}
     int getUpLimitTilt() const {return (_limits.tilt_limits[1]==180)?360:_limits.tilt_limits[1];}
-    int getLowLimitPan() const {return (_limits.pan_limits[0]==180)?-1:_limits.pan_limits[0];}
+    int getLowLimitPan() const {return (_limits.pan_limits[0]==180)?0:_limits.pan_limits[0];}
     int getUpLimitPan() const {return (_limits.pan_limits[1]==180)?360:_limits.pan_limits[1];}
 
     void setInstruction(const TELECOMMAND& instruction){_instructions = instruction;}
@@ -177,7 +176,7 @@ public:
     void setState(const char& state){_instructions.state = state;}
     void setMenu(const byte& menu){_instructions.menu.menu = menu;}
     void setPoseNumber(const byte& pose_number){_instructions.menu.pose_number = pose_number;}
-    void setDelay(const unsigned long& delay){_instructions.menu.ms_delay = delay;}
+    void setNumberOfPoint(const byte& nb){_instructions.menu.nb_of_point = nb;}
     void setNextSliderPoint(const int& point){_instructions.menu.PointA[0] = point;}
     void setNextTiltPoint(const int& point){ _instructions.menu.PointA[1] = point;}
     void setNextPanPoint(const int& point){_instructions.menu.PointA[2] = point;}

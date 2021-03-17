@@ -100,7 +100,11 @@ int switch_cursor(phi_prompt_struct* myIntegerInput, phi_prompt_struct& sign_inp
         if (add_sign && i==0)
             input_int = input_panel(&sign_input);
         else{
-            value_in_limit(myIntegerInput, user_input, nb_size, i-add_sign, min_number, max_number);
+            Serial.println(sign_input.ptr.msg);
+            if (add_sign)
+                value_in_limit(myIntegerInput, user_input, nb_size, i-add_sign, min_number, max_number, sign_input.ptr.msg);
+            else
+                value_in_limit(myIntegerInput, user_input, nb_size, i-add_sign, min_number, max_number);
             input_int = input_integer(&myIntegerInput[i-add_sign]);
         }
         if (input_int == 1 || input_int == -4){
@@ -119,28 +123,53 @@ int switch_cursor(phi_prompt_struct* myIntegerInput, phi_prompt_struct& sign_inp
 }
 
 
-bool value_in_limit(phi_prompt_struct* myIntegerInput, int * user_input, const uint8_t& nb_size, const int& i, const int& min_number, const int& max_number){
-    if (max_number>=0 || min_number>=0){
-        int low_limit = min_number/power10[nb_size-1-i] % 10;
-        int up_limit = max_number/power10[nb_size-1-i] % 10;
-        bool up_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].high.i && user_input[0]==myIntegerInput[0].high.i) && max_number>=0);
-        bool low_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].low.i && user_input[0]==myIntegerInput[0].low.i) && min_number>=0);
-        if (i==0){
-            myIntegerInput[i].low.i = low_limit;
-            myIntegerInput[i].high.i = up_limit;
+void value_in_limit(phi_prompt_struct* myIntegerInput, int * user_input, const uint8_t& nb_size, const int& i, const int& min_number, const int& max_number, const char* sign_input){
+    if (max_number!=0 || min_number!=0){
+        if (!strcmp(sign_input, "x")){
+            int low_limit = min_number/power10[nb_size-1-i] % 10;
+            int up_limit = max_number/power10[nb_size-1-i] % 10;        
+            bool up_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].high.i && user_input[0]==myIntegerInput[0].high.i) && max_number!=0);
+            bool low_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].low.i && user_input[0]==myIntegerInput[0].low.i) && min_number!=0);
+            if (i==0){
+                myIntegerInput[i].low.i = low_limit;
+                myIntegerInput[i].high.i = up_limit;
+            }
+            else{
+                myIntegerInput[i].low.i = (low_limit_reach)?low_limit:0;
+                myIntegerInput[i].high.i = (up_limit_reach)?up_limit:9;
+                user_input[i] = (user_input[i]>=up_limit && up_limit_reach)?up_limit:user_input[i];
+                user_input[i] = (user_input[i]<=low_limit && low_limit_reach)?low_limit:user_input[i];
+            }
         }
-        else if (up_limit_reach || low_limit_reach){
-            myIntegerInput[i].high.i = (up_limit_reach)?up_limit:9;
-            myIntegerInput[i].low.i = (low_limit_reach)?low_limit:0;
-            user_input[i] = (user_input[i]>=up_limit && up_limit_reach)?up_limit:user_input[i];
-            user_input[i] = (user_input[i]<=low_limit && low_limit_reach)?low_limit:user_input[i];
-            return true;
+        else if (!strcmp(sign_input, "+")){
+            Serial.println(sign_input);
+            int up_limit = max_number/power10[nb_size-1-i] % 10;        
+            bool up_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].high.i && user_input[0]==myIntegerInput[0].high.i) && max_number!=0);
+            if (i==0){
+                myIntegerInput[i].low.i = 0;
+                myIntegerInput[i].high.i = up_limit;
+            }
+            else{
+                myIntegerInput[i].low.i = 0;
+                myIntegerInput[i].high.i = (up_limit_reach)?up_limit:9;
+                user_input[i] = (user_input[i]>=up_limit)?up_limit:user_input[i];
+            }
         }
-        else{
-            myIntegerInput[i].high.i = 9;
+        else if (!strcmp(sign_input, "-")){
+            Serial.println(sign_input);
+            int low_limit = abs(min_number)/power10[nb_size-1-i] % 10;
+            bool low_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].high.i && user_input[0]==myIntegerInput[0].high.i) && min_number!=0);
+            if (i==0){
+                myIntegerInput[i].low.i = 0;
+                myIntegerInput[i].high.i = low_limit;
+            }
+            else{
+                myIntegerInput[i].low.i = 0;
+                myIntegerInput[i].high.i =(low_limit_reach)?low_limit:9;
+                user_input[i] = (user_input[i]>=low_limit && low_limit_reach)?low_limit:user_input[i];
+            }
         }
     }
-    return false;
 }
 
 

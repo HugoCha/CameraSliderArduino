@@ -318,23 +318,22 @@ namespace test_camera{
 void test_compute_limits(Camera& cam){
     Serial.println("Test compute limits : ");
     float lim[2];
-    cam.setCameraHeight(0);
-    cam.setLensLength(0);
-    cam.setRadiusLength(0);
-    cam.computeTiltLimits(lim);
-    if (!assert_equal<int>(lim[0], 3.15)){Serial.println("Low Limit set while should not be");}
-    if (!assert_equal<int>(lim[1], 3.15)){Serial.println("High Limit set while should not be");}
+    // cam.setCameraHeight(0);
+    // cam.setLensLength(0);
+    // cam.setRadiusLength(0);
+    // cam.computeTiltLimits(lim);
+    // if (!assert_equal<int>(lim[0], 3.15)){Serial.println("Low Limit set while should not be");}
+    // if (!assert_equal<int>(lim[1], 3.15)){Serial.println("High Limit set while should not be");}
 
 
     cam.setCameraHeight(110);
     cam.setLensLength(70);
     cam.setRadiusLength(30);
-    cam.setCameraLength(50);
     cam.computeTiltLimits(lim, 0.1);
     Serial.print("Low Limit Pan : ");
-    Serial.println(lim[0]*180/PI);
+    Serial.println(lim[0]);
     Serial.print("Up Limit Pan : ");
-    Serial.println(lim[1]*180/PI);
+    Serial.println(lim[1]);
     //assert_equal<int>(lim[0], -1);
     //assert_equal<int>(lim[1], -1);
 }

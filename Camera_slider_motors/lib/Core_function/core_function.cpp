@@ -30,8 +30,8 @@ void InstructionHandler::parseMenu(){
             case REGISTER_TRACKING_MODE:
                 registerTrackingMode();
             break;
-            case TIMELAPSE:
-                timelapseMode();
+            // case TIMELAPSE:
+            //     timelapseMode();
             break;
             case REGISTER_HYPERLPSE:
                 registerHyperlapseMode();
@@ -347,30 +347,31 @@ void InstructionHandler::registerTrackingMode(void){
  * 
  *****************************************************************/
 
-bool InstructionHandler::timelapseMode(void){
-    if (!_start){
-        _motor->setPoseGoal({
-            (float)_instructions.menu.PointA[0],
-            (float)_instructions.menu.PointA[1],
-            (float)_instructions.menu.PointA[2]
-        });
-        _number_of_photo = _instructions.menu.pose_number;
-        while (!_motor->executeTrajectory(100, 100));
-        _start_time = _current_time = millis();
-    }
-    else{
-        _current_time = millis();
-        if (_current_time-_start_time > _instructions.menu.ms_delay && _current_pose_index < _number_of_photo){
-            _camera->shoot();
-            _current_pose_index++;
-            _start_time = _current_time;
-        }
-    }
-    return (_current_pose_index == _number_of_photo);
-}
+// bool InstructionHandler::timelapseMode(void){
+//     if (!_start){
+//         _motor->setPoseGoal({
+//             (float)_instructions.menu.PointA[0],
+//             (float)_instructions.menu.PointA[1],
+//             (float)_instructions.menu.PointA[2]
+//         });
+//         _number_of_photo = _instructions.menu.pose_number;
+//         while (!_motor->executeTrajectory(100, 100));
+//         _start_time = _current_time = millis();
+//     }
+//     else{
+//         _current_time = millis();
+//         if (_current_time-_start_time > _instructions.menu.ms_delay && _current_pose_index < _number_of_photo){
+//             _camera->shoot();
+//             _current_pose_index++;
+//             _start_time = _current_time;
+//         }
+//     }
+//     return (_current_pose_index == _number_of_photo);
+// }
 
 
 void InstructionHandler::registerHyperlapseMode(void){
+    _number_of_photo = _instructions.menu.nb_of_point;
     addPose(_instructions.menu.PointA);
     if (_number_of_pose == 2){
         _start_pose = _target_pose[0];

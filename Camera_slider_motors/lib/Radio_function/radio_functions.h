@@ -8,6 +8,7 @@
 #include "camera_functions.h"
 #include "battery_functions.h"
 #include "motor_functions.h"
+#include "EEPROM_functions.h"
 
 #define OPTION_SEND 0
 #define FIND_HOME_MODE 1
@@ -51,7 +52,8 @@ typedef struct telecommand {
 
 
 typedef struct option {
-    byte precision = 1;
+    byte option_change = 0;
+    byte precision = 0;
     byte h_camera = 0;
     byte l_camera = 0;
     byte l_lens = 0;

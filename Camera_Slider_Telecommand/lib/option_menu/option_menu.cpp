@@ -16,8 +16,8 @@ void init_option_sub_menu(LiquidCrystal_I2C* lcd, phi_prompt_struct& myMenu, con
     myMenu.row=1; // Display prompt at row 1
     myMenu.option=45;
 
-    lcd->clear();  // Refresh menu if a button has been pushed
-    lcd->print("Reglages");
+    // lcd->clear();  // Refresh menu if a button has been pushed
+    // lcd->print("Reglages");
 }
 
 void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t& lcd_r, RadioTelecommand* radio_tel){
@@ -25,11 +25,14 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
     init_option_sub_menu(lcd, myMenu, lcd_c, lcd_r);
     OPTION current_option;
     while(1){
+        lcd->clear();
+        lcd->print("Reglages");
         if (select_list(&myMenu) == 1){
             switch (myMenu.low.i)
             {
             case 0:{
                 current_option.auto_speed = (bool)yn_dialog("Set Autospeed");
+                current_option.option_change |= (1<<4);
             }
                 break;
             case 1:{
@@ -43,10 +46,12 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
                 else if (speed == 2) current_option.precision = 4;
                 else if (speed == 3) current_option.precision = 8;
                 else if (speed == 4) current_option.precision = 16;
+                current_option.option_change |= (1<<3);
             }
             break;
             case 2:{
                 current_option.auto_mode = (bool)yn_dialog("Set Automode");
+                current_option.option_change |= (1<<2);
             }
             break;
             case 3:{
@@ -58,6 +63,7 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
                 lcd->print("s");
                 enter_number(lcd, delay, 3, 8, 2, 0);
                 current_option.delay = delay;
+                current_option.option_change |= (1<<1);
             }
             break;
             case 4:{
@@ -74,6 +80,7 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
                     current_option.r_lens = input_nb_arr[1];
                     current_option.l_lens = input_nb_arr[2];
                 }
+                current_option.option_change |= (1<<0);
             }
             default:
                 break;
@@ -81,7 +88,6 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
         }
         else{
             radio_tel->setOption(current_option);
-            Serial.println(current_option.precision);
             while(!radio_tel->sendOption());
             return;
         }

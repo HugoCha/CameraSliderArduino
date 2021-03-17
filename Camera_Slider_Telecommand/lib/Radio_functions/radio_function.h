@@ -16,13 +16,11 @@
 #define MANUAL_MODE 2
 #define REGISTER_MANUAL_MODE 3
 #define REGISTER_NUMERIC_MODE 4
-#define REGISTER_TRAJECTORY 5
-#define PROGRAMMED_MODE 6
-#define AUTOMODE 7
 #define REGISTER_TRACKING_MODE 8
+#define REGISTER_HYPERLAPSE_MODE 11
+#define PROGRAMMED_MODE 6
 #define TRACKING 9
 #define TIMELAPSE 10
-#define REGISTER_HYPERLPSE 11
 #define HYPERLAPSE 12
 #define PANORAMICLAPSE 13
 #define RESET 14
@@ -51,6 +49,7 @@ typedef struct telecommand {
 
 
 typedef struct option {
+    byte option_change = 0;
     byte precision=0;
     byte h_camera = 0;
     byte l_camera = 0;

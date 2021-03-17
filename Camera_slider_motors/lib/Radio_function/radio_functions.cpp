@@ -81,21 +81,41 @@ void RadioMotor::updateLimits(const bool& ack){
 }
 
 void RadioMotor::setOptions(MotorInterface& Mot){
-    Mot.setAutoSpeed(_slider_option.auto_speed);
-    Mot.setAutoMode(_slider_option.auto_mode);
-    Mot.setMicrostepping(_slider_option.precision);
-    POSE Low_lim = {(float)_slider_option.slider_limits[0], (float)_limits.tilt_limits[0], (float)_slider_option.pan_limits[0]};
-    POSE Up_lim = {(float)_slider_option.slider_limits[1], (float)_limits.tilt_limits[1], (float)_slider_option.pan_limits[1]};
-    Mot.setLimits(Low_lim, Up_lim);
-    Mot.setDelay((unsigned long)_slider_option.delay*1000);
+    if ((_slider_option.option_change/16)%2 == 1) {
+        Mot.setAutoSpeed(_slider_option.auto_speed);
+        saveAutoSpeed(_slider_option.auto_speed);
+    }
+    if ((_slider_option.option_change/8)%2 == 1) {
+        Mot.setMicrostepping(_slider_option.precision);
+        saveMicrostepping(_slider_option.precision);
+    }
+    if ((_slider_option.option_change/4)%2 == 1) {
+        Mot.setAutoMode(_slider_option.auto_mode);
+        saveAutomode(_slider_option.auto_mode);
+    }
+    if ((_slider_option.option_change/2)%2 == 1) {
+        Mot.setDelay((unsigned long)_slider_option.delay*1000);
+        saveDelay(_slider_option.delay);
+    }
+    if ((_slider_option.option_change)%2 == 1){
+        POSE Low_lim = {(float)_slider_option.slider_limits[0], (float)_limits.tilt_limits[0], (float)_slider_option.pan_limits[0]};
+        POSE Up_lim = {(float)_slider_option.slider_limits[1], (float)_limits.tilt_limits[1], (float)_slider_option.pan_limits[1]};
+        
+        Mot.setLimits(Low_lim, Up_lim);
+
+        saveSliderLimits(_slider_option.slider_limits[0],_slider_option.slider_limits[1]);
+        saveTiltLimits(_limits.tilt_limits[0],_limits.tilt_limits[1]);
+        savePanLimits(_slider_option.pan_limits[0],_slider_option.pan_limits[1]);
+    }
+    
     if (_slider_option.active) _camera->activate();
     else _camera->desactivate();
 
-    Serial.println("Moteur Option : ");
-    Serial.println(Mot.getAutoSpeed());
-    Serial.println(Mot.getAutoMode());
-    Serial.println(Mot.getDelay());
-    Serial.println(Mot.getMicrostepping());
+    //Serial.println("Moteur Option : ");
+    // Serial.println(Mot.getAutoSpeed());
+    // Serial.println(Mot.getAutoMode());
+    // Serial.println(Mot.getDelay());
+    // Serial.println(Mot.getMicrostepping());
 }
 
 void RadioMotor::updateMotorInfo(const MotorInterface& Mot){
@@ -135,7 +155,8 @@ bool RadioMotor::receive( MotorInterface& Mot, Battery& batt){
     }
     else if (_data2receive == 1){ 
         receiveOption(Mot);
-        _data2receive = 0;
+        if (_new_data) {_data2receive = 0;delay(10);}
+        
     }
     alertNoConnection();
     return new_instructions;

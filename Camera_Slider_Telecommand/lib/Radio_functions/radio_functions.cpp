@@ -56,8 +56,8 @@ bool RadioTelecommand::sendTelecommand(void){
 
 bool RadioTelecommand::sendOption(void){
     _instructions.menu.menu = OPTION_SEND;
+    
     if (sendTelecommand()){
-        delay(50);
         return writeOption();
     }
     return false;
@@ -69,7 +69,7 @@ bool RadioTelecommand::writeOption(void){
     if (rslt && _radio_telecommand->isAckPayloadAvailable() ) {
         receiveLimits();
     }
-    //checkConnection();
+    checkConnection();
     return _ack_received;
 }
 

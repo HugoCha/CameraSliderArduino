@@ -147,7 +147,7 @@ void InstructionHandler::registerNumericMode(void){
     //     Serial.print(_target_pose[i].tilt);
     //     Serial.print(" P : ");
     //     Serial.println(_target_pose[i].pan);
-    // }
+    //}
 }
 
 
@@ -184,12 +184,12 @@ bool InstructionHandler::programmedMode(void){
         _motor->setNextPoseGoal(_target_pose[1]);
         _start = true;
         _current_pose_index = 2;
-        Serial.println(_target_pose[0].slider);
-        Serial.println(_target_pose[0].tilt);
-        Serial.println(_target_pose[0].pan);
-        Serial.println(_target_pose[1].slider);
-        Serial.println(_target_pose[1].tilt);
-        Serial.println(_target_pose[1].pan);
+        // Serial.println(_target_pose[0].slider);
+        // Serial.println(_target_pose[0].tilt);
+        // Serial.println(_target_pose[0].pan);
+        // Serial.println(_target_pose[1].slider);
+        // Serial.println(_target_pose[1].tilt);
+        // Serial.println(_target_pose[1].pan);
     }
     if (motorExec()){
         _motor->increasePoseNumber();

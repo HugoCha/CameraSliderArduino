@@ -17,6 +17,8 @@ void programmed_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uin
     
     while(1)
     {
+        radio_tel->setMenu(RESET);
+        while(!radio_tel->sendTelecommand());
         select_list(&myMenu);
         if (PM->enterProgrammedMode(myMenu.low.i)){
             while (!PM->handleProgrammedMode());
@@ -36,7 +38,7 @@ void init_sub_menu(LiquidCrystal_I2C* lcd, phi_prompt_struct& myMenu, const uint
     // Initialize the top menu
     myMenu.ptr.list=(char**)&pr_sub_menu_items; // Assign the list to the pointer
     myMenu.low.i=0; // Default item highlighted on the list
-    myMenu.high.i=3; // Last item of the list is size of the list - 1.
+    myMenu.high.i=2; // Last item of the list is size of the list - 1.
     myMenu.width=lcd_c-1; // Length in characters of the longest list item.
     myMenu.step.c_arr[0]=3;//lcd_rows-1; // rows to auto fit entire screen
     myMenu.step.c_arr[1]=1; // one col list
@@ -94,14 +96,12 @@ bool ProgrammedMenu::handleProgrammedMode(void)
 
 void ProgrammedMenu::display_sub_menu_title(void)
 {
-    // if (_programm == REGISTER_MANUAL_MODE)
-    //     this->setTitle("Enr. Mann.");
     if (_programm == REGISTER_NUMERIC_MODE)
         this->setTitle("Enr. Num.");
-    else if (_programm == REGISTER_TRAJECTORY)
-        this->setTitle("Enr. Traj.");
     else if (_programm == REGISTER_TRACKING_MODE)
         this->setTitle("Tracking");
+    else if (_programm == REGISTER_HYPERLAPSE_MODE)
+        this->setTitle("Hyperlapse");
     else if (_programm == PROGRAMMED_MODE)
         this->setTitle("Execute Traj.");
     
@@ -116,18 +116,14 @@ int ProgrammedMenu::display_instructions()
 {
     phi_prompt_struct myLongMsg1;
     switch(_programm){
-        // case REGISTER_MANUAL_MODE:
-        //     myLongMsg1.ptr.msg_P=program_instructions1; // Assign the address of the text string to the pointer.
-        //     myLongMsg1.high.i=strlen_P(program_instructions1);
-        // break;
         case REGISTER_NUMERIC_MODE:
+            myLongMsg1.ptr.msg_P=program_instructions1; // Assign the address of the text string to the pointer.
+            myLongMsg1.high.i=strlen_P(program_instructions1); // Position of the last character in the text string, which is size of the string - 1.
+        break;
+        case REGISTER_TRACKING_MODE:
             myLongMsg1.ptr.msg_P=program_instructions2; // Assign the address of the text string to the pointer.
             myLongMsg1.high.i=strlen_P(program_instructions2); // Position of the last character in the text string, which is size of the string - 1.
-        break;
-        // case REGISTER_TRAJECTORY:
-        //     myLongMsg1.ptr.msg_P=program_instructions3; // Assign the address of the text string to the pointer.
-        //     myLongMsg1.high.i=strlen_P(program_instructions3); // Position of the last character in the text string, which is size of the string - 1.
-        case REGISTER_TRACKING_MODE:
+        case REGISTER_HYPERLAPSE_MODE:
             myLongMsg1.ptr.msg_P=program_instructions3; // Assign the address of the text string to the pointer.
             myLongMsg1.high.i=strlen_P(program_instructions3); // Position of the last character in the text string, which is size of the string - 1.
         default:
@@ -340,13 +336,7 @@ void ProgrammedMenu::handleEnterButton(void)
         play();
     else if (!_buttons_state.enter_button && _last_buttons_state.enter_button && _ack)
     {
-        if (_programm == REGISTER_MANUAL_MODE){
-            add_point(
-            _radio_telecommand->getSliderPose(),
-            _radio_telecommand->getTiltPose(),
-            _radio_telecommand->getPanPose());
-        }
-        else if (_programm == PROGRAMMED_MODE){
+        if (_programm == PROGRAMMED_MODE){
             _radio_telecommand->setShutter(true);
         }
     }
@@ -367,38 +357,14 @@ bool ProgrammedMenu::record(){
 
     updateInstructions();
     sendInstructions();
-    // if (_programm == REGISTER_MANUAL_MODE)
-    //     return manualRecord();
     if (_programm == REGISTER_NUMERIC_MODE)
         return numericRecord();
-    // else if (_programm == REGISTER_TRAJECTORY)
-    //     return recordTraj();
     else if (_programm == REGISTER_TRACKING_MODE)
-        return recordTracking();
+        return trackingRecord();
+    else if (_programm == REGISTER_HYPERLAPSE_MODE)
+        return hyperlapseRecord();
     return true;
 }
-
-
-
-/***********************************************************************
- * 
- * Manual Record
- * 
-***********************************************************************/
-
-// bool ProgrammedMenu::manualRecord(void)
-// {
-//     if (!_number_of_point){
-//         initRecordDisplay();
-//         play();
-//     }
-//     handleDisplay();
-//     updateButtons();
-//     handleButtons();
-
-//     if (!_number_of_point) stop();
-//     return (!(_size_of_array == _number_of_point));
-// }
 
 
 /******************************************************************
@@ -422,8 +388,6 @@ bool ProgrammedMenu::numericRecord(void){
     int input_nb_arr[3]= {_crosspointarray[0].slider_pos,
                            _crosspointarray[0].tilt_pos,
                            _crosspointarray[0].pan_pos};
-
-    
     initRecordDisplay();
     display_crossing_pt_nb(0);
     
@@ -469,24 +433,13 @@ bool ProgrammedMenu::actionNumericRecord(const int& temp, const int intput_nb_ar
 }
 
 
-/******************************************************************
- * 
- * Trajectory Record
- * 
-******************************************************************/
-
-
-// bool ProgrammedMenu::recordTraj(void){
-//     return false;
-// }
-
 /***********************************************************************
  * 
  * Record Tracking
  * 
 ***********************************************************************/
 
-bool ProgrammedMenu::recordTracking(){
+bool ProgrammedMenu::trackingRecord(){
     int temp = 0;
     uint8_t nb_size[3] = {3, 3, 3};  
     uint8_t sign[3] = {0, 1, 1};
@@ -517,6 +470,17 @@ bool ProgrammedMenu::recordTracking(){
     lcd->clear();
     return false;
 }
+
+/************************************************************************
+ * 
+ * Record hyperlapse
+ * 
+************************************************************************/
+
+bool ProgrammedMenu::hyperlapseRecord(void){
+    return false;
+}
+
 
 /************************************************************************
  * 
@@ -556,10 +520,9 @@ void ProgrammedMenu::updateInstructions(void)
         _radio_telecommand->setMenu(WAITING_TIME);
     }
     else{
-        if (_programm == REGISTER_MANUAL_MODE) _radio_telecommand->setMenu(MANUAL_MODE);
-        else if (_programm == REGISTER_NUMERIC_MODE) _radio_telecommand->setMenu(REGISTER_NUMERIC_MODE);
-        else if (_programm == REGISTER_TRAJECTORY) _radio_telecommand->setMenu(REGISTER_TRAJECTORY);
+        if (_programm == REGISTER_NUMERIC_MODE) _radio_telecommand->setMenu(REGISTER_NUMERIC_MODE);
         else if (_programm == REGISTER_TRACKING_MODE) _radio_telecommand->setMenu(REGISTER_TRACKING_MODE);
+        else if (_programm == REGISTER_HYPERLAPSE_MODE) _radio_telecommand->setMenu(REGISTER_HYPERLAPSE_MODE);
         else if (_programm == PROGRAMMED_MODE) _radio_telecommand->setMenu(PROGRAMMED_MODE);
         else _radio_telecommand->setMenu(WAITING_TIME);
     }
@@ -581,7 +544,6 @@ void ProgrammedMenu::updatePoint2Send(const int& nb){
 bool ProgrammedMenu::sendAllPoses(void)
 {
     int nb = 0;
-    _programm = (_programm==REGISTER_MANUAL_MODE)?REGISTER_NUMERIC_MODE:_programm;
     play();
     updateInstructions();
     updatePoint2Send(0);

@@ -691,7 +691,7 @@ void MotorInterface::stopToPose(const short& slider_pot, const short& pantilt_po
 
 bool MotorInterface::executeTrajectory(const short& slider_pot, const short& pantilt_pot){
     unsetManualMode();
-    //sensorDetect();
+    sensorDetect();
     updateCurrentPose();
     if (!_pause){
         stopToPose(slider_pot, pantilt_pot);

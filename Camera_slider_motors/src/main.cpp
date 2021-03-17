@@ -46,6 +46,18 @@ void setup() {
     radio_motor.initRadio();
     // myradio->printDetails();
     //myradio.printDetails();
+    setEEPROM(Motors);
+    Serial.println("Moteur Option : ");
+    Serial.println(Motors.getAutoSpeed());
+    Serial.println(Motors.getAutoMode());
+    Serial.println(Motors.getDelay());
+    Serial.println(Motors.getMicrostepping());
+    Serial.println(Motors.getLowLimits().slider);
+    Serial.println(Motors.getUpLimits().slider);
+    Serial.println(Motors.getLowLimits().tilt);
+    Serial.println(Motors.getUpLimits().tilt);
+    Serial.println(Motors.getLowLimits().pan);
+    Serial.println(Motors.getUpLimits().pan);
     Motors.setCurrentPose({500, 0, 0});
 }
 

@@ -10,11 +10,9 @@
 
 #define MAX_NB_POINT 15
 
-// const char PROGMEM pr_sub_menu_item00[]="Enr. manuelle";
 const char PROGMEM pr_sub_menu_item01[]="Enr. numerique";
-const char PROGMEM pr_sub_menu_item02[]="Parcours enregistre";
-const char PROGMEM pr_sub_menu_item03[]="Tracking";
-//const char PROGMEM * const pr_sub_menu_items[] = {pr_sub_menu_item00, pr_sub_menu_item01, pr_sub_menu_item02, pr_sub_menu_item03};
+const char PROGMEM pr_sub_menu_item02[]="Tracking";
+const char PROGMEM pr_sub_menu_item03[]="Hyperlapse";
 const char PROGMEM * const pr_sub_menu_items[] = {pr_sub_menu_item01, pr_sub_menu_item02, pr_sub_menu_item03};
 
 struct CrossingPoint{
@@ -26,24 +24,17 @@ struct CrossingPoint{
 
 typedef struct CrossingPoint CROSSPOINT;
 
-//const char PROGMEM manual_instructions[]="You can control the plateform with the joystick and the speed of the plateform and rail with potentiometers.\n Click OK to continue.";
-// const char PROGMEM program_instructions1[]=
-// "Vous pouvez controler le support avec le joystick, \
-// vous pouvez aussi controlez la vitesse \
-// du support et du rail avec les potentiometres. \
-// Vous pouvez rentrer des points de passage en cliquant sur >. \
-// Cliquez sur OK pour continuer.";
-const char PROGMEM program_instructions2[]=
+const char PROGMEM program_instructions1[]=
 "Vous pouvez rentrer des points de passages, si vous connaissez \
 les points de passage au prealable.\
 Cliquez sur OK pour continuer.";
-const char PROGMEM program_instructions3[]=
+const char PROGMEM program_instructions2[]=
 "Vous faire le tracking d'un objet en entrant sa position et\
 les positions de depart et d'arrivee du slider. \
 Cliquer OK pour continuer.";
-// const char PROGMEM program_instructions4[]=
-// "Vous pouvez suivre le dernier parcours qui a ete enregistre.
-// Cliquer OK pour continuer.";
+const char PROGMEM program_instructions3[]=
+"Vous pouvez realiser un timelapse/hyperlapse.\
+Cliquer OK pour continuer.";
 
 void init_sub_menu(LiquidCrystal_I2C* lcd, phi_prompt_struct& myMenu, const uint8_t& lcd_c, const uint8_t& lcd_r);
 void programmed_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t& lcd_r, RadioTelecommand* radio_tel);
@@ -60,10 +51,9 @@ protected:
 private:
     byte _programm=255; 
     // 0 : numeric record, 
-    // 1 : manual record,
-    // 2 : tracking,
+    // 1 : tracking
+    // 2 : timelapse/hyperlapse,
     // 3 : execute traj
-    // 4 : record traj
 
 
 public:
@@ -85,11 +75,10 @@ protected:
 
 private:
     void setProgramm(byte pr){
-        // if (pr == 0) _programm = REGISTER_MANUAL_MODE;
         if (pr == 0) _programm = REGISTER_NUMERIC_MODE;
-        //if (pr == 2) _programm = REGISTER_TRAJECTORY;
         if (pr == 1) _programm = REGISTER_TRACKING_MODE;
-        //if (pr == 4) _programm = REGISTER_MANUAL_MODE;
+        if (pr == 2) _programm = REGISTER_HYPERLAPSE_MODE;
+        if (pr == 3) _programm = PROGRAMMED_MODE;
     }
     byte getProgramm(void) const {return _programm;}
 
@@ -121,11 +110,12 @@ protected:
     
     void handleEnterButton(void);
 
-    bool manualRecord(void);
+    //bool manualRecord(void);
+    // bool recordTraj(void);
     bool numericRecord(void);
     void enterNumericPoint(void);
-    // bool recordTraj(void);
-    bool recordTracking(void);
+    bool hyperlapseRecord(void);
+    bool trackingRecord(void);
 
     void updatePoint2Send(const int& nb);
     bool sendAllPoses(void);

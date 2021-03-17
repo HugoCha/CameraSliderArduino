@@ -395,6 +395,8 @@ public:
 
 private:
     bool updatePoseGoal(void){
+        // Serial.println(_pose_goal.slider);
+        // Serial.println(_current_pose.slider);
         if (PoseGoalReached()){
             if (!(_next_pose_goal == _pose_goal))
             {

@@ -330,7 +330,7 @@ void test_compute_limits(Camera& cam){
     cam.setLensLength(70);
     cam.setRadiusLength(30);
     cam.setCameraLength(50);
-    cam.computeTiltLimits(lim, 0);
+    cam.computeTiltLimits(lim, 0.1);
     Serial.print("Low Limit Pan : ");
     Serial.println(lim[0]*180/PI);
     Serial.print("Up Limit Pan : ");

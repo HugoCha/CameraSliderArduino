@@ -25,23 +25,23 @@
 #define EIGHTH_STEP 8
 #define SIXTEENTH_STEP 16
 
-#define MIN_SPEED_STEP_MOTOR 50.0
-#define MAX_SPEED_STEP_MOTOR 1200.0
+#define MIN_SPEED_STEP_MOTOR 25.0F
+#define MAX_SPEED_STEP_MOTOR 1000.0F
 
 
-#define SLIDER_PULLEY_TEETH 20
-#define PAN_GEAR_RATIO 3.0
-#define TILT_GEAR_RATIO 3.0
+#define SLIDER_PULLEY_TEETH 16.0F
+#define PAN_GEAR_RATIO 3.75F
+#define TILT_GEAR_RATIO 3.75F
 #define PULLEY_STEP 2
-#define STEP_PER_TURN 200.0
-#define DEGREE_PER_STEP 360.0/STEP_PER_TURN
+#define STEP_PER_TURN 200.0F
+#define DEGREE_PER_STEP 360.0F/STEP_PER_TURN
 
 // Hall Sensors config
 #define HALL_PAN A1
 #define HALL_TILT A2
 #define IR_SLIDER A3 
 // The minimal time (us) needed to consider that a sensor change of state 
-#define SENSOR_CHANGE_MIN_TIME 100
+#define SENSOR_CHANGE_MIN_TIME 25
 
 
 // Slider Limits (mm)
@@ -122,8 +122,8 @@ private:
     bool _pause=false;
 
 public:
-    const POSE _home_pose1 = {0, 0, 0};
-    const POSE _home_pose2 = {1000, 0, 0};
+    const POSE _home_pose1 = {20, 0, 0};
+    const POSE _home_pose2 = {980, 0, 0};
 
 // Methods
 public:
@@ -348,12 +348,12 @@ private:
     void setDisable(void);
 
 private:
-    int convertmmToStep(const float& slider_pos){return (slider_pos*(STEP_PER_TURN*(float)_micro_stepping))/(SLIDER_PULLEY_TEETH*PULLEY_STEP);}
-    float convertStepTomm(const int& slider_step){return (slider_step*PULLEY_STEP*SLIDER_PULLEY_TEETH)/(STEP_PER_TURN*(float)_micro_stepping);}
-    int convertDegreeToStepPan(const float& pan_pos){return (pan_pos*PAN_GEAR_RATIO*(float)_micro_stepping)/(DEGREE_PER_STEP);}
-    float convertStepToDegreePan(const int& pan_step){return ((pan_step*DEGREE_PER_STEP)/PAN_GEAR_RATIO*(float)_micro_stepping);}
-    int convertDegreeToStepTilt(const float& tilt_pos){return (tilt_pos*TILT_GEAR_RATIO*(float)_micro_stepping)/(DEGREE_PER_STEP);}
-    float convertStepToDegreeTilt(const int& tilt_step){return ((tilt_step*DEGREE_PER_STEP)/TILT_GEAR_RATIO*(float)_micro_stepping);}
+    long convertmmToStep(const float& slider_pos){return (slider_pos*(STEP_PER_TURN*(float)_micro_stepping))/(SLIDER_PULLEY_TEETH*PULLEY_STEP);}
+    float convertStepTomm(const long& slider_step){return (slider_step*PULLEY_STEP*SLIDER_PULLEY_TEETH)/(STEP_PER_TURN*(float)_micro_stepping);}
+    long convertDegreeToStepPan(const float& pan_pos){return (pan_pos*PAN_GEAR_RATIO*(float)_micro_stepping)/(DEGREE_PER_STEP);}
+    float convertStepToDegreePan(const long& pan_step){return ((pan_step*DEGREE_PER_STEP)/(PAN_GEAR_RATIO*(float)_micro_stepping));}
+    long convertDegreeToStepTilt(const float& tilt_pos){return (tilt_pos*TILT_GEAR_RATIO*(float)_micro_stepping)/(DEGREE_PER_STEP);}
+    float convertStepToDegreeTilt(const long& tilt_step){return ((tilt_step*DEGREE_PER_STEP)/(TILT_GEAR_RATIO*(float)_micro_stepping));}
 
 private:
     void computeSliderStep(void);
@@ -395,8 +395,6 @@ public:
 
 private:
     bool updatePoseGoal(void){
-        // Serial.println(_pose_goal.slider);
-        // Serial.println(_current_pose.slider);
         if (PoseGoalReached()){
             if (!(_next_pose_goal == _pose_goal))
             {
@@ -427,8 +425,8 @@ private:
     void interpolateSpeed(void);
     void changeSpeed(const float& max_slider_speed, const float& max_tiltpan_speed);
     bool hasChangeSpeed(const short& slider_pot, const short& pantiltpot){
-        return (!((_max_speed.slider == (MAX_SPEED_STEP_MOTOR*abs((float)slider_pot))/100) && 
-                (_max_speed.pan == (MAX_SPEED_STEP_MOTOR*abs((float)pantiltpot))/100)));
+        return (!(_max_speed.slider == ((float)abs(slider_pot)*(MAX_SPEED_STEP_MOTOR/100)) && 
+                _max_speed.pan == ((float)abs(pantiltpot)*(MAX_SPEED_STEP_MOTOR/100))));
     }
 private:    
     void convertPotToMaxSpeed(const short& slider_pot, const short& pantilt_pot);

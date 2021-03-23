@@ -6,12 +6,8 @@
 #include "test_src/test_src_function.h"
 #include "battery_functions.h"
 #include "core_function.h"
-//#include <printf.h>
+#include <printf.h>
 
-#define JOY_X A0
-#define JOY_Y A1
-#define POTX A2
-#define POT_PT A3
 
 // AccelStepper* stepper_slider = new AccelStepper(1, STEP1, DIR1);
 // AccelStepper* stepper_tilt = new AccelStepper(1, STEP2, DIR2);
@@ -41,34 +37,40 @@ void show_data(void);
 
 void setup() {
     Serial.begin(9600);
+    
     //printf_begin();
-    setup_test();
-    Motors.init_motors();
     radio_motor.initRadio();
-    // myradio->printDetails();
     //myradio.printDetails();
+    
+    //setup_test();
+    Motors.init_motors();
+    
+    init_sensors();
+    //camera.init_camera();
+    
     setEEPROM(Motors);
-    Serial.println("Moteur Option : ");
-    Serial.println(Motors.getAutoSpeed());
-    Serial.println(Motors.getAutoMode());
-    Serial.println(Motors.getDelay());
-    Serial.println(Motors.getMicrostepping());
-    Serial.println(Motors.getLowLimits().slider);
-    Serial.println(Motors.getUpLimits().slider);
-    Serial.println(Motors.getLowLimits().tilt);
-    Serial.println(Motors.getUpLimits().tilt);
-    Serial.println(Motors.getLowLimits().pan);
-    Serial.println(Motors.getUpLimits().pan);
+    // Serial.println("Moteur Option : ");
+    // Serial.println(Motors.getAutoSpeed());
+    // Serial.println(Motors.getAutoMode());
+    // Serial.println(Motors.getDelay());
+    // Serial.println(Motors.getMicrostepping());
+    // Serial.println(Motors.getLowLimits().slider);
+    // Serial.println(Motors.getUpLimits().slider);
+    // Serial.println(Motors.getLowLimits().tilt);
+    // Serial.println(Motors.getUpLimits().tilt);
+    // Serial.println(Motors.getLowLimits().pan);
+    // Serial.println(Motors.getUpLimits().pan);
     Motors.setCurrentPose({500, 0, 0});
 }
 
 void loop() {
-    current_time = millis();
+    //current_time = millis();
     if (radio_motor.receive(Motors, battery)){
         instr.execute(radio_motor.getInstructions());
 
     }
     //if (current_time-start_time>10) show_data();
+    //Motors.executeTrajectory(100, 100);
     Motors.run();   
 }
 

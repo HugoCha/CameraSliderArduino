@@ -33,10 +33,10 @@ void InstructionHandler::parseMenu(){
             // case TIMELAPSE:
             //     timelapseMode();
             break;
-            case REGISTER_HYPERLPSE:
+            case REGISTER_HYPERLAPSE:
                 registerHyperlapseMode();
             break;
-            case HYPERLAPSE:
+            case HYPERLAPSE_MODE:
                 hyperlapseMode();
             break;
             case PANORAMICLAPSE:
@@ -92,6 +92,10 @@ void InstructionHandler::stop(void){
  * Add pose, clear last pose, clear all pose
  * 
 ****************************************************************/
+void InstructionHandler::addPose(const short& slider, const float& tilt, const float& pan){
+    addPose({(float)slider, (float)tilt, (float)pan});
+}
+
 void InstructionHandler::addPose(const int newpose[3]){
     addPose({(float)newpose[0], (float)newpose[1], (float)newpose[2]});
 }
@@ -124,6 +128,7 @@ void InstructionHandler::resetAll(void){
     _play = false;
     _start_time = _current_time = millis();
     _start = false;
+    _motor->resetPoseNumber();
 }
 
 /**************************************************************
@@ -136,18 +141,8 @@ void InstructionHandler::registerNumericMode(void){
     if (_instructions.menu.pose_number >= _number_of_pose && 
     _instructions.menu.pose_number!=255)
     { // If user add pose
-        addPose({_instructions.menu.PointA[0], _instructions.menu.PointA[1], _instructions.menu.PointA[2]});
+        addPose(_instructions.menu.PointA[0], _instructions.menu.PointA[1], _instructions.menu.PointA[2]);
     }
-    // for (int i=0; i<_number_of_pose; i++){
-    //     Serial.println();
-    //     Serial.print("Target Pose Array : ");
-    //     Serial.print("S : ");
-    //     Serial.print(_target_pose[i].slider);
-    //     Serial.print(" T : ");
-    //     Serial.print(_target_pose[i].tilt);
-    //     Serial.print(" P : ");
-    //     Serial.println(_target_pose[i].pan);
-    //}
 }
 
 
@@ -179,17 +174,11 @@ void InstructionHandler::motorTeleop(void){
 
 bool InstructionHandler::programmedMode(void){
     if (!_start){
-        _motor->resetPoseNumber();
+        //_motor->resetPoseNumber();
         _motor->setPoseGoal(_target_pose[0]);
         _motor->setNextPoseGoal(_target_pose[1]);
         _start = true;
         _current_pose_index = 2;
-        // Serial.println(_target_pose[0].slider);
-        // Serial.println(_target_pose[0].tilt);
-        // Serial.println(_target_pose[0].pan);
-        // Serial.println(_target_pose[1].slider);
-        // Serial.println(_target_pose[1].tilt);
-        // Serial.println(_target_pose[1].pan);
     }
     if (motorExec()){
         _motor->increasePoseNumber();
@@ -222,7 +211,6 @@ void InstructionHandler::autoMode(void){
         }  
     }
     else if (exec && reverse){
-        Serial.println();
         _motor->setNextPoseGoal(_target_pose[--_current_pose_index]);
         if (_current_pose_index <= 0){
             reverse = false;
@@ -284,8 +272,8 @@ void InstructionHandler::interpolationTracking(
 
     float tilt_angle = computeTiltAngleFromPose(object_pose[2]*10, object_pose[1]*10);
 
-    addPose({start_slider, tilt_angle, start_pan_angle});
-    addPose({end_slider, tilt_angle, end_pan_angle});
+    addPose(start_slider, tilt_angle, start_pan_angle);
+    addPose(end_slider, tilt_angle, end_pan_angle);
 }
 
 
@@ -313,7 +301,6 @@ float InstructionHandler::computeTiltAngleFromPose(
 
 
 void InstructionHandler::registerTrackingMode(void){
-    Serial.println(_instructions.menu.PointA[0]);
     if (_instructions.menu.pose_number==0){
         _object_pose[0] = _instructions.menu.PointA[0];
         _object_pose[1] = _instructions.menu.PointA[1];
@@ -326,16 +313,6 @@ void InstructionHandler::registerTrackingMode(void){
     if  (_number_of_pose == 2){
         unsigned short start_slider = _target_pose[0].slider;
         unsigned short end_slider = _target_pose[1].slider;
-        for (int i=0; i<_number_of_pose; i++){
-            Serial.println();
-            Serial.print("Target Pose Array : ");
-            Serial.print("S : ");
-            Serial.print(_target_pose[i].slider);
-            Serial.print(" T : ");
-            Serial.print(_target_pose[i].tilt);
-            Serial.print(" P : ");
-            Serial.println(_target_pose[i].pan);
-        }
         clearAllPose();
         interpolationTracking(_object_pose, start_slider, end_slider);
     }
@@ -372,7 +349,8 @@ void InstructionHandler::registerTrackingMode(void){
 
 void InstructionHandler::registerHyperlapseMode(void){
     _number_of_photo = _instructions.menu.nb_of_point;
-    addPose(_instructions.menu.PointA);
+    if (_instructions.menu.pose_number >= _number_of_pose)
+        addPose(_instructions.menu.PointA);
     if (_number_of_pose == 2){
         _start_pose = _target_pose[0];
         _end_pose = _target_pose[1];
@@ -387,7 +365,6 @@ void InstructionHandler::interpolationHyperlapse(const POSE& start_pose, const P
         pose2add.tilt   -= (end_pose.tilt - start_pose.tilt)/(_number_of_photo);
         pose2add.pan    -= (end_pose.pan - start_pose.pan)/(_number_of_photo);
     }
-    //else{++number_of_photo_left;}
 
     int number_of_pose2add = (number_of_photo_left+1+_number_of_photo/(TARGET_ARRAY_SIZE) < TARGET_ARRAY_SIZE)?number_of_photo_left+1+_number_of_photo/(TARGET_ARRAY_SIZE):TARGET_ARRAY_SIZE;
     
@@ -408,9 +385,7 @@ bool InstructionHandler::hyperlapseMode(void){
     if (!_start || _current_pose_index == TARGET_ARRAY_SIZE+1){
         interpolationHyperlapse(_start_pose, _end_pose, number_of_photo_left);
         _start = false;
-        //number_of_photo_left -= (TARGET_ARRAY_SIZE-_number_of_photo/(TARGET_ARRAY_SIZE));
     }
-    
     return (programmedMode() && number_of_photo_left<=0 );
 }
 

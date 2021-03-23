@@ -8,9 +8,9 @@
 
 
 void init_sensors(void){
-    pinMode(IR_SLIDER, INPUT);
-    pinMode(HALL_TILT, INPUT);
-    pinMode(HALL_PAN, INPUT);
+    pinMode(IR_SLIDER, INPUT_PULLUP);
+    pinMode(HALL_TILT, INPUT_PULLUP);
+    pinMode(HALL_PAN, INPUT_PULLUP);
     return;
 }
 
@@ -33,8 +33,8 @@ void MotorInterface::sensorDetect(void){
 bool MotorInterface::checkSliderSensorConsistency(void){
     // Check if slider sensor is Consistent compared with current pose
     // If the current pose computed is not close to one of home pose
-    if (!((_home_pose1.slider-10<=_current_pose.slider && _current_pose.slider<=_home_pose1.slider+10))||
-        (_home_pose2.slider-10<=_current_pose.slider && _current_pose.slider<=_home_pose2.slider+10)){
+    if (!((_home_pose1.slider-10<=_current_pose.slider && _current_pose.slider<=_home_pose1.slider+10)||
+        (_home_pose2.slider-10<=_current_pose.slider && _current_pose.slider<=_home_pose2.slider+10))){
             _slider_obstacle = true;
             return false;
         }
@@ -70,7 +70,8 @@ void MotorInterface::needToUpdateCurrentTiltPose(const bool& tilt_sensor){
 }
 
 void MotorInterface::needToUpdateCurrentPanPose(const bool& pan_sensor){
-    if (isNewSensorStateTilt(pan_sensor)){
+    if (isNewSensorStatePan(pan_sensor)){
+        
         if (!_sensor_state.pan){
             setCurrentPanPoseHomePose();
             computePanStep();
@@ -83,7 +84,7 @@ bool MotorInterface::AssureSensorChange(unsigned long& start_time, unsigned long
     if (cur_sens != new_sens && 
     current_time - start_time >= SENSOR_CHANGE_MIN_TIME ){
         cur_sens = new_sens;
-        start_time = current_time = 0;
+        start_time = current_time = micros();
         return true;
     }
     // If a change of state has occured and it's not sure that's not a sensor error 
@@ -92,7 +93,7 @@ bool MotorInterface::AssureSensorChange(unsigned long& start_time, unsigned long
     }
     // If no change has occured or the sensor is back to normal value after error
     else{
-        start_time = current_time = 0;
+        start_time = current_time = micros();
     }
     return false;
 }
@@ -100,7 +101,7 @@ bool MotorInterface::AssureSensorChange(unsigned long& start_time, unsigned long
 
 bool MotorInterface::isNewSensorStateSlider(const bool& slider_sensor){
     static unsigned long start_time_ir_slider = 0, current_time_ir_slider = 0;
-
+    
     return AssureSensorChange(
         start_time_ir_slider, 
         current_time_ir_slider, 
@@ -111,7 +112,7 @@ bool MotorInterface::isNewSensorStateSlider(const bool& slider_sensor){
 
 bool MotorInterface::isNewSensorStatePan(const bool& pan_sensor){
     static unsigned long start_time_hall_pan = 0, current_time_hall_pan = 0;
-
+    
     return AssureSensorChange(
         start_time_hall_pan, 
         current_time_hall_pan, 
@@ -155,9 +156,9 @@ MotorInterface::MotorInterface(AccelStepper* slider_step, AccelStepper* tilt_ste
     _auto_speed = auto_sp;
     setMicrostepping(microstepping);
 
-    _pose_goal = {0, 0.0, 0.0};
+    _pose_goal = {20, 0.0, 0.0};
     //_current_pose = {0, 0.0, 0.0};
-    _next_pose_goal = {0, 0.0, 0.0};
+    _next_pose_goal = {20, 0.0, 0.0};
 
     _current_speed = {0, 0, 0};
     _max_speed = {0, 0, 0};
@@ -165,7 +166,7 @@ MotorInterface::MotorInterface(AccelStepper* slider_step, AccelStepper* tilt_ste
 
     _step_count = {0, 0, 0};
     _direction = {0, 0, 0};
-    _sensor_state = {0, 0, 0};
+    _sensor_state = {false, false, false};
     _ms_delay = 0;
     _manual_mode = false;
 }
@@ -198,10 +199,10 @@ MotorInterface::MotorInterface(
 
 
 void MotorInterface::init_motors(void){
-    pinMode(ENABLE, OUTPUT);
-    pinMode(MS1, OUTPUT);
-    pinMode(MS2, OUTPUT);
-    pinMode(MS3, OUTPUT);
+    // pinMode(ENABLE, OUTPUT);
+    // pinMode(MS1, OUTPUT);
+    // pinMode(MS2, OUTPUT);
+    // pinMode(MS3, OUTPUT);
 
     pinMode(STEP1, OUTPUT);
     pinMode(DIR1, OUTPUT);
@@ -212,7 +213,7 @@ void MotorInterface::init_motors(void){
     pinMode(STEP3, OUTPUT);
     pinMode(DIR3, OUTPUT);
 
-    setEnable();
+    // setEnable();
     setStepMode();
 }
 
@@ -349,7 +350,10 @@ bool MotorInterface::needToStopPan(void){
  * **********************************************/
 
 void MotorInterface::setCurrentSliderPoseHomePose(void){
-    _current_pose.slider = (_direction.slider)?_home_pose2.slider : _home_pose1.slider;
+    _current_pose.slider = (
+        (_direction.slider && _current_pose.slider > _home_pose1.slider + 10) ||
+        (!_direction.slider && _current_pose.slider > _home_pose2.slider - 10))?
+        _home_pose2.slider : _home_pose1.slider;
 }
 
 
@@ -576,7 +580,7 @@ bool MotorInterface::hasChangePanDirectionToAvoidLimits(const unsigned short& jo
 
 void MotorInterface::getOutSliderLimit(const short& slider_pot){
     if (hasChangeSliderDirectionToAvoidLimits(slider_pot)){
-        _current_speed.slider = ((float)slider_pot/100) * MAX_SPEED_STEP_MOTOR;
+        _current_speed.slider = ((float)slider_pot * MAX_SPEED_STEP_MOTOR)/100.0;
         //_direction.slider = !_direction.slider;
         //_pose_goal.slider = (_direction.slider)?1000:-1000;
     }
@@ -612,8 +616,7 @@ void MotorInterface::handleSliderTeleoperation(const short& slider_pot){
     _max_speed.slider = MAX_SPEED_STEP_MOTOR;
     if (!(needToStopSlider())){
         updateSliderDirection(slider_pot);
-        _current_speed.slider = (((float)slider_pot)/100)*MAX_SPEED_STEP_MOTOR;
-        //_pose_goal.slider = (_direction.slider)?-1000:+1000;
+        _current_speed.slider = ((float)slider_pot*MAX_SPEED_STEP_MOTOR)/100.0;
     }
     else{
         if (!_slider_obstacle){
@@ -625,7 +628,7 @@ void MotorInterface::handleSliderTeleoperation(const short& slider_pot){
 void MotorInterface::handleTiltTeleoperation(const short& pantilt_pot, const unsigned short& joytilt){
     _max_speed.tilt = ((float)pantilt_pot * MAX_SPEED_STEP_MOTOR)/100.0;
     if (!needToStopTilt()){
-        //updateTiltDirection(joytilt);
+        updateTiltDirection(joytilt);
         _current_speed.tilt = 10*int(((((float)joytilt-512)/512)*_max_speed.tilt)/10);
     }
     else{
@@ -638,7 +641,6 @@ void MotorInterface::handlePanTeleoperation(const short& pantilt_pot, const unsi
     if (!needToStopPan()){
         _current_speed.pan = (((float)joypan-512)/512)*_max_speed.pan;
         updatePanDirection(joypan);
-        //_pose_goal.pan = (_direction.pan)?-1000:1000;
     }
     else{
         getOutPanLimit(joypan);
@@ -649,12 +651,12 @@ void MotorInterface::teleoperation(const short& slider_pot, const short& pantilt
     setManualMode();
     sensorDetect();
     updateCurrentPose();
+
     if (!_pause){
 
         handleSliderTeleoperation(slider_pot);
         handleTiltTeleoperation(pantilt_pot, joytilt);
         handlePanTeleoperation(pantilt_pot, joypan);
-        
         setMaxSpeed(_max_speed);
         setCurrentSpeed(_current_speed);
         SpeedUnderThreshold();
@@ -693,6 +695,7 @@ bool MotorInterface::executeTrajectory(const short& slider_pot, const short& pan
     unsetManualMode();
     sensorDetect();
     updateCurrentPose();
+    updateAllDirection();
     if (!_pause){
         stopToPose(slider_pot, pantilt_pot);
         //convertPotToMaxSpeed(slider_pot, pantilt_pot);    

@@ -10,10 +10,10 @@
 
 // Motor Config
 
-#define ENABLE 0
-#define MS1 1
-#define MS2 2
-#define MS3 11
+// #define ENABLE 0
+// #define MS1 1
+// #define MS2 2
+// #define MS3 11
 
 #define STEP1 3
 #define DIR1 4
@@ -28,12 +28,12 @@
 #define SIXTEENTH_STEP 16
 
 
-#define SLIDER_PULLEY_TEETH 20
-#define PAN_GEAR_RATIO 3.0
-#define TILT_GEAR_RATIO 3.0
-#define PULLEY_STEP 2
-#define STEP_PER_TURN 200.0
-#define DEGREE_PER_STEP 360.0/STEP_PER_TURN
+// #define SLIDER_PULLEY_TEETH 20
+// #define PAN_GEAR_RATIO 3.0
+// #define TILT_GEAR_RATIO 3.0
+// #define PULLEY_STEP 2
+// #define STEP_PER_TURN 200.0
+// #define DEGREE_PER_STEP 360.0/STEP_PER_TURN
 
 
 // Radio Config
@@ -43,8 +43,8 @@
 #define BUZZER A7
 
 // Camera Config
-#define SHUTTER 12
-#define FOCUS 13
+// #define SHUTTER 12
+// #define FOCUS 13
 
 #define SHUTTER_DELAY 200
 
@@ -63,9 +63,9 @@
 // EEPROM Config
 
 
-// Slider Limits (mm)
-#define SLIDER_LOW_LIMIT 21.0
-#define SLIDER_UP_LIMIT 980.0
+// // Slider Limits (mm)
+// #define SLIDER_LOW_LIMIT 21.0
+// #define SLIDER_UP_LIMIT 980.0
 
 
 

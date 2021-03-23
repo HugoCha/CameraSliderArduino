@@ -227,13 +227,12 @@ void ProgrammedMenu::display_motor_info(void)
 
 void ProgrammedMenu::update_display_motor_info(void)
 {
-    int potX = (_programm == REGISTER_MANUAL_MODE)?_buttons_state.potentiometerX-100:_buttons_state.potentiometerX;
-    _current_index = (_programm == PROGRAMMED_MODE)?_radio_telecommand->getSliderInfo().pt_nb:_size_of_array;
+    _current_index = _radio_telecommand->getSliderInfo().pt_nb;
     update_display_motor_info(
         (int)_radio_telecommand->getSliderPose(),
         (int)_radio_telecommand->getTiltPose(),
         (int)_radio_telecommand->getPanPose(),
-        potX,
+        _buttons_state.potentiometerX,
         _buttons_state.potentiometerPT,
         0
     );
@@ -250,7 +249,7 @@ void ProgrammedMenu::enterNumberOfPoint(void)
         enter_number(lcd, nb_pt, 3, 10, 2, 0, 0, 250);
     else if (_programm==REGISTER_NUMERIC_MODE)
         enter_number(lcd, nb_pt, 2, 10, 2, 0, 0, MAX_NB_POINT);
-    _number_of_point = (uint8_t)nb_pt;
+    _number_of_point = (byte)nb_pt;
     return;
 }
 
@@ -368,12 +367,14 @@ bool ProgrammedMenu::numericRecord(void){
     int input_nb_arr[3]= {_crosspointarray[0].slider_pos,
                            _crosspointarray[0].tilt_pos,
                            _crosspointarray[0].pan_pos};
+    int number_of_pt = 0;
+
     initRecordDisplay();
     display_crossing_pt_nb(0);
     _radio_telecommand->setNumberOfPoint(_number_of_point);
-    _number_of_point = (_programm == REGISTER_HYPERLAPSE_MODE)?2:_number_of_point;
+    number_of_pt = (_programm == REGISTER_HYPERLAPSE_MODE)?2:_number_of_point;
 
-    while (_size_of_array < _number_of_point)
+    while (_size_of_array < number_of_pt)
     {    
         temp = enter3number(lcd, input_nb_arr, nb_size, 2, sign, min_number, max_number);
         if (!actionNumericRecord(temp, input_nb_arr)){return true;}
@@ -424,16 +425,16 @@ bool ProgrammedMenu::trackingRecord(){
     int temp = 0;
     uint8_t nb_size[3] = {3, 3, 3};  
     uint8_t sign[3] = {0, 1, 1};
-    int min_number[3] = {-1,-1,-1};
-    int max_number[3] = {-1,-1,-1};
+    int min_number[3] = {0,0,0};
+    int max_number[3] = {0,0,0};
     int input_nb_arr[3]= {_crosspointarray[0].slider_pos,
                            _crosspointarray[0].tilt_pos,
                            _crosspointarray[0].pan_pos};
 
-    _number_of_point = 3;
+    _number_of_point = 2;
     display_object_pose();
 
-    while (_size_of_array < _number_of_point)
+    while (_size_of_array < 3)
     {
         if (_size_of_array == 0){
             display_object_pose();  
@@ -488,14 +489,15 @@ bool ProgrammedMenu::execute(void){
 void ProgrammedMenu::updateInstructions(void)
 {
     if (_number_of_point == 0){
-        _radio_telecommand->setMenu(WAITING_TIME);
+        _radio_telecommand->setMenu(WAITING_FOR_USER_CHOICE);
     }
     else{
         if (_programm == REGISTER_NUMERIC_MODE) _radio_telecommand->setMenu(REGISTER_NUMERIC_MODE);
         else if (_programm == REGISTER_TRACKING_MODE) _radio_telecommand->setMenu(REGISTER_TRACKING_MODE);
         else if (_programm == REGISTER_HYPERLAPSE_MODE) _radio_telecommand->setMenu(REGISTER_HYPERLAPSE_MODE);
+        else if (_programm == HYPERLAPSE_MODE) _radio_telecommand->setMenu(HYPERLAPSE_MODE);
         else if (_programm == PROGRAMMED_MODE) _radio_telecommand->setMenu(PROGRAMMED_MODE);
-        else _radio_telecommand->setMenu(WAITING_TIME);
+        else _radio_telecommand->setMenu(WAITING_FOR_USER_CHOICE);
     }
     _radio_telecommand->setJoystick(_buttons_state.JoyX, _buttons_state.JoyY);
     _radio_telecommand->setPotentiometer(_buttons_state.potentiometerX, _buttons_state.potentiometerPT);
@@ -530,6 +532,6 @@ bool ProgrammedMenu::sendAllPoses(void)
         }
         if (_stop) break;
     }
-    _programm = PROGRAMMED_MODE;
+    _programm = (_programm == REGISTER_HYPERLAPSE_MODE)?HYPERLAPSE_MODE:PROGRAMMED_MODE;
     return false;
 }

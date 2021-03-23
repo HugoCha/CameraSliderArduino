@@ -70,8 +70,8 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
                 int temp = 0;
                 uint8_t nb_size[3] = {3, 3, 3};  
                 uint8_t sign[3] = {0, 0, 0};
-                int min_number[3] = {-1,-1,-1};
-                int max_number[3] = {-1,-1,-1};
+                int min_number[3] = {0,0,0};
+                int max_number[3] = {0,0,0};
                 int input_nb_arr[3]= {0, 0, 0};
                 display_camera_info(lcd, 2);
                 temp = enter3number(lcd, input_nb_arr, nb_size, 2, sign, min_number, max_number);

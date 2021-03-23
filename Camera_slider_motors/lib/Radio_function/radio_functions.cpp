@@ -45,7 +45,6 @@ bool RadioMotor::noConnection(void){
 
 void RadioMotor::alertNoConnection(void){
     if (!checkConnection()){
-        // Serial.println("No connection");
         tone(BUZZER, 1000);
     }
     else{
@@ -110,23 +109,29 @@ void RadioMotor::setOptions(MotorInterface& Mot){
     if (_slider_option.active) _camera->activate();
     else _camera->desactivate();
 
-    //Serial.println("Moteur Option : ");
+    // Serial.println("Moteur Option : ");
     // Serial.println(Mot.getAutoSpeed());
     // Serial.println(Mot.getAutoMode());
     // Serial.println(Mot.getDelay());
     // Serial.println(Mot.getMicrostepping());
+    // Serial.println(Mot.getLowLimits().slider);
+    // Serial.println(Mot.getUpLimits().slider);
+    // Serial.println(Mot.getLowLimits().tilt);
+    // Serial.println(Mot.getUpLimits().tilt);
+    // Serial.println(Mot.getLowLimits().pan);
+    // Serial.println(Mot.getUpLimits().pan);
 }
 
 void RadioMotor::updateMotorInfo(const MotorInterface& Mot){
     _slider_info.pt_nb = Mot.getPoseNumber();
-
-    _slider_info.slider_pose = Mot.getCurrentPose().slider;
+    
+    _slider_info.slider_pose = (unsigned short)(Mot.getCurrentPose().slider);
     _slider_info.tilt_pose = ((int)Mot.getCurrentPose().tilt)%360;
     _slider_info.pan_pose = ((int)Mot.getCurrentPose().pan)%360;
 
-    _slider_info.slider_speed = (abs(Mot.getCurrentSpeed().slider)*100)/Mot.getMaxSpeed().slider;
-    _slider_info.tilt_speed   = (abs(Mot.getCurrentSpeed().tilt)*100)/Mot.getMaxSpeed().tilt;
-    _slider_info.pan_speed    = (abs(Mot.getCurrentSpeed().pan)*100)/Mot.getMaxSpeed().pan;
+    _slider_info.slider_speed = (unsigned short)((abs(Mot.getCurrentSpeed().slider)*100)/Mot.getMaxSpeed().slider);
+    _slider_info.tilt_speed   = (unsigned short)((abs(Mot.getCurrentSpeed().tilt)*100)/Mot.getMaxSpeed().tilt);
+    _slider_info.pan_speed    = (unsigned short)((abs(Mot.getCurrentSpeed().pan)*100)/Mot.getMaxSpeed().pan);
 }
 
 void RadioMotor::updateBatteryInfo(Battery& bat){

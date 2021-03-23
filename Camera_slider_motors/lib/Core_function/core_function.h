@@ -72,6 +72,7 @@ private:
     bool panoramiclapseMode(void);
     
     void addPose(const POSE& newpose);
+    void addPose(const short& slider, const float& tilt, const float& pan);
     void addPose(const int newpose[3]);
     void clearLastPose(void);
     void clearAllPose(void);

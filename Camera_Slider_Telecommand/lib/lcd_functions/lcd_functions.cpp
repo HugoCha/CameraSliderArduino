@@ -100,7 +100,6 @@ int switch_cursor(phi_prompt_struct* myIntegerInput, phi_prompt_struct& sign_inp
         if (add_sign && i==0)
             input_int = input_panel(&sign_input);
         else{
-            Serial.println(sign_input.ptr.msg);
             if (add_sign)
                 value_in_limit(myIntegerInput, user_input, nb_size, i-add_sign, min_number, max_number, sign_input.ptr.msg);
             else
@@ -142,7 +141,6 @@ void value_in_limit(phi_prompt_struct* myIntegerInput, int * user_input, const u
             }
         }
         else if (!strcmp(sign_input, "+")){
-            Serial.println(sign_input);
             int up_limit = max_number/power10[nb_size-1-i] % 10;        
             bool up_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].high.i && user_input[0]==myIntegerInput[0].high.i) && max_number!=0);
             if (i==0){
@@ -156,7 +154,6 @@ void value_in_limit(phi_prompt_struct* myIntegerInput, int * user_input, const u
             }
         }
         else if (!strcmp(sign_input, "-")){
-            Serial.println(sign_input);
             int low_limit = abs(min_number)/power10[nb_size-1-i] % 10;
             bool low_limit_reach = ((user_input[i-1] == myIntegerInput[i-1].high.i && user_input[0]==myIntegerInput[0].high.i) && min_number!=0);
             if (i==0){

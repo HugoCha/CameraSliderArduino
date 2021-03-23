@@ -44,8 +44,8 @@ class ProgrammedMenu : public MenuClass{
 
 protected:
     byte _current_index = 0;
-    uint8_t _number_of_point=0;
-    uint8_t _size_of_array=0;
+    byte _number_of_point=0;
+    byte _size_of_array=0;
     CROSSPOINT _crosspointarray[MAX_NB_POINT];
 
 private:
@@ -70,7 +70,7 @@ public:
     bool handleProgrammedMode(void);
 
 protected:
-    uint8_t getNbPoint(void) const {return _number_of_point;}
+    byte getNbPoint(void) const {return _number_of_point;}
     void setNbPoint(uint8_t pt){_number_of_point = pt;}
 
 private:
@@ -88,8 +88,8 @@ private:
 protected:
     int display_instructions() override;
 
-    void display_crossing_pt_nb(const uint8_t& pt_nb);
-    void display_pt(const uint8_t& pt_nb);
+    void display_crossing_pt_nb(const byte& pt_nb);
+    void display_pt(const byte& pt_nb);
     void display_object_pose(void);
     void display_slider_pose(const byte& pose);
     void display_motor_info(void) override;

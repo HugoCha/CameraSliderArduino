@@ -8,7 +8,7 @@
 
 #include <phi_interfaces.h>
 #include <phi_prompt.h>
-//#include "printf.h"
+#include "printf.h"
 
 #include "main_menu.h"
 
@@ -44,12 +44,12 @@ void setup() {
     Serial.begin(9600);
     Serial.println("LCD Menu");
     //printf_begin();
-    
-    init_phi_prompt(lcd, joy, function_keys, lcd_columns, lcd_rows, '~'); 
     radio_tel->initRadio();
     //myradio->printDetails();
+    init_phi_prompt(lcd, joy, function_keys, lcd_columns, lcd_rows, '~');
 }
 
 void loop() {
+    //lcd->print("No connection");
     top_menu(lcd, radio_tel, lcd_columns, lcd_rows);
 }

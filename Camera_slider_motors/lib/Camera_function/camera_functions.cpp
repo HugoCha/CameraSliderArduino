@@ -1,8 +1,8 @@
 #include "camera_functions.h"
 
 void Camera::init_camera(void){
-    pinMode(SHUTTER, OUTPUT);
-    pinMode(FOCUS, OUTPUT);
+    // pinMode(SHUTTER, OUTPUT);
+    // pinMode(FOCUS, OUTPUT);
 }
 
 bool Camera::shoot(void){

@@ -21,8 +21,8 @@
 #define REGISTER_TRACKING_MODE 8
 #define TRACKING 9
 #define TIMELAPSE 10
-#define REGISTER_HYPERLPSE 11
-#define HYPERLAPSE 12
+#define REGISTER_HYPERLAPSE 11
+#define HYPERLAPSE_MODE 12
 #define PANORAMICLAPSE 13
 #define RESET 14
 #define WAITING_FOR_USER_CHOICE 15
@@ -146,7 +146,7 @@ private:
     void updateSliderInfo(const MotorInterface& Mot, Battery& batt, const bool ack){
         _slider_info.ack = ack;
         updateMotorInfo(Mot);
-        //updateBatteryInfo(batt);
+        updateBatteryInfo(batt);
         _radio_motor->writeAckPayload(1, &_slider_info, sizeof(_slider_info));
     }
 

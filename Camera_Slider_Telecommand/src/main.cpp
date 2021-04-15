@@ -37,6 +37,26 @@ LiquidCrystal_I2C* lcd = new LiquidCrystal_I2C(0x27, lcd_columns, lcd_rows);
 RadioTelecommand* radio_tel = new RadioTelecommand(myradio);
 
 
+
+void find_home(void){
+    ok_dialog("Finding Home. Check if no obstacle", 0);
+    lcd->clear();
+    lcd->setCursor(6,1);
+    lcd->print("Find Home");
+    radio_tel->setMenu(FIND_HOME_MODE);
+    radio_tel->setState('r');
+    radio_tel->sendTelecommand();
+    while (radio_tel->getSliderPose() != SLIDER_HOME_POSE || 
+        radio_tel->getTiltPose() != TILT_HOME_POSE ||
+        radio_tel->getPanPose() != PAN_HOME_POSE)
+    {
+        Serial.println(radio_tel->getSliderPose());
+        Serial.println(radio_tel->getTiltPose());
+        Serial.println(radio_tel->getPanPose());
+        radio_tel->sendTelecommand();
+    }
+}
+
 void setup() {
     lcd->init();
     lcd->backlight();
@@ -47,6 +67,7 @@ void setup() {
     radio_tel->initRadio();
     //myradio->printDetails();
     init_phi_prompt(lcd, joy, function_keys, lcd_columns, lcd_rows, '~');
+    find_home();
 }
 
 void loop() {

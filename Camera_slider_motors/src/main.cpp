@@ -38,9 +38,9 @@ void show_data(void);
 void setup() {
     Serial.begin(9600);
     
-    //printf_begin();
+    // printf_begin();
     radio_motor.initRadio();
-    //myradio.printDetails();
+    // myradio.printDetails();
     
     //setup_test();
     Motors.init_motors();
@@ -60,14 +60,13 @@ void setup() {
     // Serial.println(Motors.getUpLimits().tilt);
     // Serial.println(Motors.getLowLimits().pan);
     // Serial.println(Motors.getUpLimits().pan);
-    Motors.setCurrentPose({500, 0, 0});
+    Motors.setCurrentPose({980, 359, 359});
 }
 
 void loop() {
     //current_time = millis();
     if (radio_motor.receive(Motors, battery)){
         instr.execute(radio_motor.getInstructions());
-
     }
     //if (current_time-start_time>10) show_data();
     //Motors.executeTrajectory(100, 100);

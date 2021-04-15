@@ -6,7 +6,7 @@ void init_option_sub_menu(LiquidCrystal_I2C* lcd, phi_prompt_struct& myMenu, con
     // Initialize the top menu
     myMenu.ptr.list=(char**)&option_menu_items; // Assign the list to the pointer
     myMenu.low.i=0; // Default item highlighted on the list
-    myMenu.high.i=4; // Last item of the list is size of the list - 1.
+    myMenu.high.i=5; // Last item of the list is size of the list - 1.
     myMenu.width=lcd_c-1; // Length in characters of the longest list item.
     myMenu.step.c_arr[0]=3;//lcd_rows-1; // rows to auto fit entire screen
     myMenu.step.c_arr[1]=1; // one col list
@@ -31,11 +31,22 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
             switch (myMenu.low.i)
             {
             case 0:{
+                lcd->clear();
+                lcd->setCursor(0,0);
+                lcd->print("Battery");
+                lcd->setCursor(10,2);
+                lcd->print(radio_tel->getBattery());
+                lcd->setCursor(13,2);
+                lcd->print((char)0x25);
+                while (wait_on_escape(50) == NO_KEY);
+            }
+            break;
+            case 1:{
                 current_option.auto_speed = (bool)yn_dialog("Set Autospeed");
                 current_option.option_change |= (1<<4);
             }
                 break;
-            case 1:{
+            case 2:{
                 int speed = 0;
                 lcd->clear();
                 lcd->setCursor(0,0);
@@ -49,12 +60,12 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
                 current_option.option_change |= (1<<3);
             }
             break;
-            case 2:{
+            case 3:{
                 current_option.auto_mode = (bool)yn_dialog("Set Automode");
                 current_option.option_change |= (1<<2);
             }
             break;
-            case 3:{
+            case 4:{
                 int delay = 0;
                 lcd->clear();
                 lcd->setCursor(0,0);
@@ -66,7 +77,7 @@ void option_sub_menu(LiquidCrystal_I2C* lcd, const uint8_t& lcd_c, const uint8_t
                 current_option.option_change |= (1<<1);
             }
             break;
-            case 4:{
+            case 5:{
                 int temp = 0;
                 uint8_t nb_size[3] = {3, 3, 3};  
                 uint8_t sign[3] = {0, 0, 0};

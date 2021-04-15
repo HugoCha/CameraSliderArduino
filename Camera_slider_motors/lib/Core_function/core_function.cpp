@@ -246,11 +246,11 @@ bool InstructionHandler::programmedMode(const bool& automode){
 
 bool InstructionHandler::findHomeMode(void)
 {
-    _motor->setPoseGoal(_motor->_home_pose1);
-    
-    if (_motor->executeTrajectory(50, 50) && _motor->AllSensorActive())
-        return true;
-    return false;
+    if (!_start){
+        _motor->setPoseGoal({20,0,0});
+        _start = true;
+    }
+    return _motor->find_home();
 }
 
 

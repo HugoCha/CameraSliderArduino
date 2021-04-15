@@ -45,7 +45,7 @@ bool MotorInterface::checkSliderSensorConsistency(void){
 void MotorInterface::needToUpdateCurrentSliderPose(const bool& slider_sensor){
     if (isNewSensorStateSlider(slider_sensor)){
         if (!_sensor_state.slider){ // If an obstacle is detected boolean inverted
-            if (checkSliderSensorConsistency()){
+            if (checkSliderSensorConsistency() || _find_home){
                 setCurrentSliderPoseHomePose();
                 computeSliderStep();
             }
@@ -616,7 +616,7 @@ void MotorInterface::handleSliderTeleoperation(const short& slider_pot){
     _max_speed.slider = MAX_SPEED_STEP_MOTOR;
     if (!(needToStopSlider())){
         updateSliderDirection(slider_pot);
-        _current_speed.slider = ((float)slider_pot*MAX_SPEED_STEP_MOTOR)/100.0;
+        _current_speed.slider = (abs(slider_pot)>10)?(MIN_SPEED_STEP_MOTOR+(float)slider_pot*(MAX_SPEED_STEP_MOTOR-MIN_SPEED_STEP_MOTOR))/100.0:0;
     }
     else{
         if (!_slider_obstacle){
@@ -691,6 +691,7 @@ void MotorInterface::stopToPose(const short& slider_pot, const short& pantilt_po
 } 
 
 
+
 bool MotorInterface::executeTrajectory(const short& slider_pot, const short& pantilt_pot){
     unsetManualMode();
     sensorDetect();
@@ -702,4 +703,17 @@ bool MotorInterface::executeTrajectory(const short& slider_pot, const short& pan
     }
     needToStopSlider();
     return (updatePoseGoal());
+}
+
+
+
+bool MotorInterface::find_home(void){
+    unsetManualMode();
+    _find_home = true;
+    sensorDetect();
+    updateCurrentPose();
+    updateAllDirection();
+    stopToPose(15, 21); // TO SEE IF an adaptative speed is required
+    _find_home = updatePoseGoal();
+    return _find_home;
 }

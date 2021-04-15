@@ -120,6 +120,7 @@ private:
     bool _manual_mode;
     unsigned long _ms_delay;
     bool _pause=false;
+    bool _find_home=false;
 
 public:
     const POSE _home_pose1 = {20, 0, 0};
@@ -453,6 +454,7 @@ private:
     void handlePanTeleoperation(const short& pantilt_pot, const unsigned short& joypan);
 
 public:
+    bool find_home(void);
     void teleoperation(const short& slider_pot, const short& pantilt_pot, const unsigned short& joytilt, const unsigned short& joypan);
     bool executeTrajectory(const short& slider_pot, const short& pantilt_pot);
 };
